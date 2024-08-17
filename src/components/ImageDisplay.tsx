@@ -1,9 +1,4 @@
-import React, {
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import Loader from "./Loader";
 import { renderErrorToast } from "../utils";
 // import html2canvas from "html2canvas";
