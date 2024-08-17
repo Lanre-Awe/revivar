@@ -15,6 +15,7 @@ const App = () => {
   const [showText, setShowText] = useState(false);
   const inputRef = useRef(null);
   const captureRef = useRef(null);
+  //fetch random images
   const fetchRandom = async () => {
     try {
       const response = await axios.get(
@@ -34,10 +35,12 @@ const App = () => {
       console.log(error);
     }
   };
+  //use effect to fetch images on load
   useEffect(() => {
     fetchRandom();
   }, []);
 
+  //generate card and show loader to simulate some form of loading animation
   const generateCard = () => {
     const inputValue = inputRef.current.value.trim();
     setText(inputValue);
@@ -45,10 +48,12 @@ const App = () => {
     setDownload(true);
   };
 
+  //convert rgb object to string
   const formatRgb = (rgbObject) => {
     return `rgb(${rgbObject.r},${rgbObject.g},${rgbObject.b})`;
   };
 
+  //download the edited image
   const downloadImage = async () => {
     if (captureRef.current) {
       const canvas = await html2canvas(captureRef.current, {
@@ -80,6 +85,13 @@ const App = () => {
     }
   };
 
+  //clear all function
+  const handleClear = () => {
+    setShowText(false);
+    setDownload(false);
+    // inputRef.current.value = "";
+  };
+
   return (
     <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
       <div className="flex gap-4 items-center mb-6">
@@ -98,7 +110,7 @@ const App = () => {
           ))}
       </div>
       <button
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg px-4 py-2 mb-6 transition-colors duration-300 ease-in-out"
+        className="bg-blue-600 hover:bg-blue-700 font-montserratSemiBold text-white rounded-lg shadow-lg px-4 py-2 mb-6 transition-colors duration-300 ease-in-out"
         onClick={fetchRandom}
       >
         Fetch Random Images
@@ -113,7 +125,7 @@ const App = () => {
                 textShadow: `0px 0px 10px ${formatRgb(blurColor)}`,
                 filter: "blur(1px)",
               }}
-              className="absolute top-5 text-3xl font-bold left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+              className="absolute top-10 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
             >
               Thank you
             </p>
@@ -131,7 +143,7 @@ const App = () => {
 
                 filter: "blur(1px)",
               }}
-              className="absolute bottom-5 text-3xl font-bold left-1/2 transform -translate-x-1/2 z-50"
+              className="absolute bottom-5 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 z-50"
             >
               {text}
             </p>
@@ -145,10 +157,10 @@ const App = () => {
             type="text"
             placeholder="Enter your name"
             ref={inputRef}
-            className="w-full px-4 py-2 mb-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 transition-colors duration-300 ease-in-out"
+            className="w-full px-4 py-2 mb-4 border-2 font-montserratRegular border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 transition-colors duration-300 ease-in-out"
           />
           <button
-            className="bg-green-500 hover:bg-green-600 text-white rounded-lg shadow-lg px-4 py-2 transition-colors duration-300 ease-in-out w-full"
+            className="bg-green-500 hover:bg-green-600 font-montserratSemiBold text-white rounded-lg shadow-lg px-4 py-2 transition-colors duration-300 ease-in-out w-full"
             onClick={generateCard}
           >
             Generate Card
@@ -159,25 +171,25 @@ const App = () => {
         <div>
           <div className="flex gap-6">
             <div>
-              <p>Text color</p>
+              <p className="font-montserratSemiBold">Text color</p>
               <RgbColorPicker color={textColor} onChange={setTextColor} />
             </div>
             <div>
-              <p>Blur color</p>
+              <p className="font-montserratSemiBold">Blur color</p>
               <RgbColorPicker color={blurColor} onChange={setBlurColor} />
             </div>
           </div>
-          <div className="flex gap-4 my-5">
+          <div className="flex gap-4 my-5 justify-center">
             <button
-              className="bg-green-500 w-36 flex gap-2 items-center justify-center hover:bg-green-600 text-white rounded-lg shadow-lg px-4 py-2 transition-colors duration-300 ease-in-out"
+              className="bg-green-500 w-36 flex gap-2 items-center justify-center hover:bg-green-600 text-white rounded-lg shadow-lg px-4 py-2 font-montserratSemiBold transition-colors duration-300 ease-in-out"
               onClick={downloadImage}
             >
               <FaDownload />
               Download
             </button>
             <button
-              className="bg-gray-500 w-36 flex gap-2 items-center justify-center hover:bg-gray-600 text-white rounded-lg shadow-lg px-4 py-2 transition-colors duration-300 ease-in-out"
-              onClick={generateCard}
+              className="bg-gray-500 w-36 flex gap-2 items-center justify-center hover:bg-gray-600 text-white rounded-lg shadow-lg px-4 py-2 font-montserratSemiBold transition-colors duration-300 ease-in-out"
+              onClick={handleClear}
             >
               Clear All
               <MdClear />
