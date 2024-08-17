@@ -1,10 +1,11 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Loader from "./Loader";
 
 interface Image {
   id: string;
   urls: {
     thumb: string;
+    small: string;
   };
 }
 
@@ -14,7 +15,7 @@ interface ImageSidebarProps {
   loading: boolean;
   errorText: string;
   selectedImage: Image | null;
-  setSelectedImage: (image: Image) => void;
+  setSelectedImage: Dispatch<SetStateAction<Image | null>>;
   fetchRandom: () => void;
 }
 

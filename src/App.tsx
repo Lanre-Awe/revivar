@@ -2,7 +2,7 @@ import axios from "axios";
 import html2canvas from "html2canvas";
 import { useEffect, useRef, useState } from "react";
 import ImageSidebar from "./components/ImageSideBar";
-import ImageDisplay from "./components/ImageDisplay";
+import ImageDisplay, { ImageDisplayHandle } from "./components/ImageDisplay";
 import Controls from "./components/Controls";
 import ColorPickers from "./components/ColorPickers";
 import { ToastContainer } from "react-toastify";
@@ -27,7 +27,7 @@ const App = () => {
   const [errorText, setErrorText] = useState("");
   const [text, setText] = useState("");
   const [showText, setShowText] = useState(false);
-  const imageRef = useRef(null);
+  const imageRef = useRef<ImageDisplayHandle>(null);
   //fetch random images
 
   const fetchRandom = async () => {
@@ -51,9 +51,16 @@ const App = () => {
         setIsLoading(false);
         setError(true);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setIsLoading(false);
-      setErrorText(error.response.data);
+
+      if (axios.isAxiosError(error)) {
+        setErrorText(error.response?.data || "An unknown error occurred");
+      } else {
+        // Handle other types of errors
+        setErrorText("An unknown error occurred");
+      }
+
       setError(true);
     }
   };
@@ -65,9 +72,12 @@ const App = () => {
   //download the edited image
   const downloadImage = async () => {
     if (imageRef.current) {
-      const canvas = await html2canvas(imageRef.current?.getElement(), {
-        useCORS: true,
-      });
+      const canvas = await html2canvas(
+        imageRef.current?.getElement() as HTMLElement,
+        {
+          useCORS: true,
+        }
+      );
 
       // Desired aspect ratio (4:5)
       const aspectRatio = 1.25;

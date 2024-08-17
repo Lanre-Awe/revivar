@@ -6,6 +6,7 @@ import { renderErrorToast } from "../utils";
 interface Image {
   id: string;
   urls: {
+    thumb: string;
     small: string;
   };
 }
@@ -22,8 +23,8 @@ interface ImageDisplayProps {
   setDownload: (download: boolean) => void;
 }
 
-interface ImageDisplayHandle {
-  getElement: () => HTMLDivElement | null;
+export interface ImageDisplayHandle {
+  getElement: () => HTMLElement | null;
 }
 
 const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
@@ -51,7 +52,7 @@ const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
     ];
 
     useImperativeHandle(ref, () => ({
-      getElement: () => captureRef.current,
+      getElement: () => captureRef.current as HTMLElement | null,
     }));
 
     const generateCard = () => {
