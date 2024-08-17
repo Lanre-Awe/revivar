@@ -29,16 +29,17 @@ const App = () => {
   const [showText, setShowText] = useState(false);
   const imageRef = useRef(null);
   //fetch random images
+
   const fetchRandom = async () => {
     setError(false);
+    setImageArr([]);
     setIsLoading(true);
     try {
       const response = await axios.get(
         "https://api.unsplash.com/photos/random?count=4",
         {
           headers: {
-            Authorization:
-              "Client-ID ccWXT_3DZvp4WppYMevY0WY_TsvCoaxWF6l7ph_gpbg",
+            Authorization: `Client-ID ${import.meta.env.VITE_SPLASH_API_KEY}`,
           },
         }
       );
@@ -69,7 +70,7 @@ const App = () => {
       });
 
       // Desired aspect ratio (4:5)
-      const aspectRatio = 4 / 5;
+      const aspectRatio = 1.25;
 
       // Calculate the target dimensions
       const width = canvas.width;
