@@ -1,22 +1,36 @@
 import axios from "axios";
 import html2canvas from "html2canvas";
 import { useEffect, useRef, useState } from "react";
-import { RgbColorPicker } from "react-colorful";
-import { FaDownload } from "react-icons/fa";
-import { MdClear } from "react-icons/md";
+import ImageSidebar from "./components/ImageSideBar";
+import ImageDisplay from "./components/ImageDisplay";
+import Controls from "./components/Controls";
+import ColorPickers from "./components/ColorPickers";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface Image {
+  id: string;
+  urls: {
+    thumb: string;
+    small: string;
+  };
+}
 
 const App = () => {
-  const [imageArr, setImageArr] = useState([]);
+  const [imageArr, setImageArr] = useState<Image[]>([]);
   const [textColor, setTextColor] = useState({ r: 0, g: 0, b: 0 });
   const [blurColor, setBlurColor] = useState({ r: 255, g: 0, b: 0 });
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [download, setDownload] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [text, setText] = useState("");
   const [showText, setShowText] = useState(false);
-  const inputRef = useRef(null);
-  const captureRef = useRef(null);
+  const imageRef = useRef(null);
   //fetch random images
   const fetchRandom = async () => {
+    setError(false);
+    setIsLoading(true);
     try {
       const response = await axios.get(
         "https://api.unsplash.com/photos/random?count=4",
@@ -29,10 +43,16 @@ const App = () => {
       );
       console.log(response);
       if (response.status == 200) {
+        setIsLoading(false);
         setImageArr(response.data);
+      } else {
+        setIsLoading(false);
+        setError(true);
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
+      setError(true);
     }
   };
   //use effect to fetch images on load
@@ -40,23 +60,10 @@ const App = () => {
     fetchRandom();
   }, []);
 
-  //generate card and show loader to simulate some form of loading animation
-  const generateCard = () => {
-    const inputValue = inputRef.current.value.trim();
-    setText(inputValue);
-    setShowText(true);
-    setDownload(true);
-  };
-
-  //convert rgb object to string
-  const formatRgb = (rgbObject) => {
-    return `rgb(${rgbObject.r},${rgbObject.g},${rgbObject.b})`;
-  };
-
   //download the edited image
   const downloadImage = async () => {
-    if (captureRef.current) {
-      const canvas = await html2canvas(captureRef.current, {
+    if (imageRef.current) {
+      const canvas = await html2canvas(imageRef.current?.getElement(), {
         useCORS: true,
       });
 
@@ -89,115 +96,55 @@ const App = () => {
   const handleClear = () => {
     setShowText(false);
     setDownload(false);
-    // inputRef.current.value = "";
   };
 
   return (
-    <div className="flex flex-col items-center p-6 bg-gray-50 min-h-screen">
-      <div className="flex gap-4 items-center mb-6">
-        {imageArr.length > 0 &&
-          imageArr.map((item: any) => (
-            <img
-              onClick={() => setSelectedImage(item)}
-              src={item.urls.thumb}
-              key={item.id}
-              className={`w-28 h-28 object-cover rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                selectedImage && selectedImage.id === item.id
-                  ? "border-4 border-blue-600"
-                  : "border-2 border-transparent"
-              }`}
-            />
-          ))}
+    <>
+      <ToastContainer />
+      <div className="flex flex-row min-h-screen bg-gray-50 p-6">
+        <ImageSidebar
+          imageArr={imageArr}
+          selectedImage={selectedImage}
+          loading={isLoading}
+          error={error}
+          setSelectedImage={setSelectedImage}
+          fetchRandom={fetchRandom}
+        />
+
+        <div className="flex flex-col items-center w-2/4 pl-6">
+          <ImageDisplay
+            ref={imageRef}
+            selectedImage={selectedImage}
+            textColor={textColor}
+            download={download}
+            blurColor={blurColor}
+            text={text}
+            showText={showText}
+            setText={setText}
+            setShowText={setShowText}
+            setDownload={setDownload}
+          />
+
+          {selectedImage && download && (
+            <div className="flex gap-4 mt-5 justify-center">
+              <Controls
+                downloadImage={downloadImage}
+                handleClear={handleClear}
+              />
+            </div>
+          )}
+        </div>
+
+        {selectedImage && download && (
+          <ColorPickers
+            textColor={textColor}
+            setTextColor={setTextColor}
+            blurColor={blurColor}
+            setBlurColor={setBlurColor}
+          />
+        )}
       </div>
-      <button
-        className="bg-blue-600 hover:bg-blue-700 font-montserratSemiBold text-white rounded-lg shadow-lg px-4 py-2 mb-6 transition-colors duration-300 ease-in-out"
-        onClick={fetchRandom}
-      >
-        Fetch Random Images
-      </button>
-
-      {selectedImage && (
-        <div className="w-full max-w-lg relative mb-6" ref={captureRef}>
-          {showText && (
-            <p
-              style={{
-                color: formatRgb(textColor),
-                textShadow: `0px 0px 10px ${formatRgb(blurColor)}`,
-                filter: "blur(1px)",
-              }}
-              className="absolute top-10 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
-            >
-              Thank you
-            </p>
-          )}
-          <img
-            src={selectedImage.urls.small}
-            className="w-full rounded-lg shadow-md"
-            alt="Selected"
-          />
-          {showText && (
-            <p
-              style={{
-                color: formatRgb(textColor),
-                textShadow: `0px 0px 10px ${formatRgb(blurColor)}`,
-
-                filter: "blur(1px)",
-              }}
-              className="absolute bottom-5 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 z-50"
-            >
-              {text}
-            </p>
-          )}
-        </div>
-      )}
-
-      {selectedImage && !download && (
-        <div className="w-full max-w-lg mb-6">
-          <input
-            type="text"
-            placeholder="Enter your name"
-            ref={inputRef}
-            className="w-full px-4 py-2 mb-4 border-2 font-montserratRegular border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 transition-colors duration-300 ease-in-out"
-          />
-          <button
-            className="bg-green-500 hover:bg-green-600 font-montserratSemiBold text-white rounded-lg shadow-lg px-4 py-2 transition-colors duration-300 ease-in-out w-full"
-            onClick={generateCard}
-          >
-            Generate Card
-          </button>
-        </div>
-      )}
-      {selectedImage && download && (
-        <div>
-          <div className="flex gap-6">
-            <div>
-              <p className="font-montserratSemiBold">Text color</p>
-              <RgbColorPicker color={textColor} onChange={setTextColor} />
-            </div>
-            <div>
-              <p className="font-montserratSemiBold">Blur color</p>
-              <RgbColorPicker color={blurColor} onChange={setBlurColor} />
-            </div>
-          </div>
-          <div className="flex gap-4 my-5 justify-center">
-            <button
-              className="bg-green-500 w-36 flex gap-2 items-center justify-center hover:bg-green-600 text-white rounded-lg shadow-lg px-4 py-2 font-montserratSemiBold transition-colors duration-300 ease-in-out"
-              onClick={downloadImage}
-            >
-              <FaDownload />
-              Download
-            </button>
-            <button
-              className="bg-gray-500 w-36 flex gap-2 items-center justify-center hover:bg-gray-600 text-white rounded-lg shadow-lg px-4 py-2 font-montserratSemiBold transition-colors duration-300 ease-in-out"
-              onClick={handleClear}
-            >
-              Clear All
-              <MdClear />
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
