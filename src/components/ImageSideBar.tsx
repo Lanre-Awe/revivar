@@ -12,6 +12,7 @@ interface ImageSidebarProps {
   imageArr: Image[];
   error: boolean;
   loading: boolean;
+  errorText: string;
   selectedImage: Image | null;
   setSelectedImage: (image: Image) => void;
   fetchRandom: () => void;
@@ -21,20 +22,24 @@ const ImageSidebar: React.FC<ImageSidebarProps> = ({
   imageArr,
   selectedImage,
   error,
+  errorText,
   loading,
   setSelectedImage,
   fetchRandom,
 }) => {
   return (
-    <div className=" w-1/4">
+    <div className="md:w-1/4 sm:w-full">
       <div className="mb-4">
-        <h1 className="text-3xl font-montserratBold text-gray-600 animate-bounce">
+        <h1 className="md:text-3xl sm:text-2xl font-montserratBold sm:text-center md:text-left text-gray-600 animate-bounce">
           Gratitude Gram
         </h1>
-        <span className="text-xs font-montserratSemiBold">
+        <p className="text-xs font-montserratSemiBold sm:text-center md:text-left">
           Send Thanks That Make a Lasting Impression!
-        </span>
+        </p>
       </div>
+      <p className="uppercase font-montserratSemiBold text-sm text-center text-green-700 my-4">
+        Click on an image to get started
+      </p>
       <div className="flex flex-col gap-4 items-center w-full">
         {imageArr.length > 0 && !loading && !error ? (
           <div className="grid grid-cols-2 gap-4 w-full">
@@ -59,7 +64,7 @@ const ImageSidebar: React.FC<ImageSidebarProps> = ({
           <div className="flex items-center justify-center absolute inset-0 bg-white bg-opacity-70 z-50">
             <div className="flex flex-col items-center">
               <p className="mt-4 text-lg font-montserratSemiBold text-gray-700">
-                An Error Occured
+                {errorText}
               </p>
               <button
                 className="bg-blue-600 hover:bg-blue-700 font-montserratSemiBold text-white rounded-lg shadow-lg px-4 py-2 mt-6 transition-colors duration-300 ease-in-out w-full"

@@ -82,7 +82,10 @@ const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
     return (
       <>
         {selectedImage && (
-          <div className="w-96 max-w-3xl relative mb-6" ref={captureRef}>
+          <div
+            className="md:w-96 sm:w-72 md:max-w-3xl sm:max-w-xl relative mb-6"
+            ref={captureRef}
+          >
             {isLoading && <Loader loadingTexts={loadingTexts} />}
             {showText && (
               <p
@@ -91,14 +94,14 @@ const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
                   textShadow: `0px 0px 10px ${formatRgb(blurColor)}`,
                   filter: "blur(1px)",
                 }}
-                className="absolute top-10 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
+                className="absolute top-10  md:text-3xl sm:text-xl  font-montserratBold left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
               >
                 Thank you
               </p>
             )}
             <img
               src={selectedImage.urls.small}
-              className="w-full h-96 rounded-lg shadow-md"
+              className="w-full md:h-96 sm:h-72 rounded-lg shadow-md"
               alt="Selected"
             />
             {showText && (
@@ -108,7 +111,7 @@ const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
                   textShadow: `0px 0px 10px ${formatRgb(blurColor)}`,
                   filter: "blur(1px)",
                 }}
-                className="absolute bottom-5 text-3xl font-montserratBold left-1/2 transform -translate-x-1/2 z-50"
+                className="absolute bottom-5 md:text-3xl sm:text-xl font-montserratBold left-1/2 transform -translate-x-1/2 z-50"
               >
                 {text}
               </p>
@@ -117,7 +120,7 @@ const ImageDisplay = forwardRef<ImageDisplayHandle, ImageDisplayProps>(
         )}
 
         {selectedImage && !download && (
-          <div className="w-96 max-w-3xl mb-6">
+          <div className="md:w-96 sm:w-72 md:max-w-3xl sm:max-w-xl mb-6">
             <input
               type="text"
               placeholder="Enter your name"

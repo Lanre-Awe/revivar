@@ -24,6 +24,7 @@ const App = () => {
   const [download, setDownload] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState("");
   const [text, setText] = useState("");
   const [showText, setShowText] = useState(false);
   const imageRef = useRef(null);
@@ -51,7 +52,7 @@ const App = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
+      setErrorText(error.response.data);
       setError(true);
     }
   };
@@ -101,17 +102,18 @@ const App = () => {
   return (
     <>
       <ToastContainer />
-      <div className="flex flex-row min-h-screen bg-gray-50 p-6">
+      <div className="flex md:flex-row sm:flex-col sm:items-center md:items-start sm:gap-5 min-h-screen bg-gray-50 p-6">
         <ImageSidebar
           imageArr={imageArr}
           selectedImage={selectedImage}
           loading={isLoading}
           error={error}
+          errorText={errorText}
           setSelectedImage={setSelectedImage}
           fetchRandom={fetchRandom}
         />
 
-        <div className="flex flex-col items-center w-2/4 pl-6">
+        <div className="flex flex-col items-center md:w-2/4 sm:w-full md:pl-6 sm:pl-0">
           <ImageDisplay
             ref={imageRef}
             selectedImage={selectedImage}
